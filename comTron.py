@@ -9,8 +9,8 @@
 #    
 #
 #------------------------------------------------------------------------------
-from siqo_lib   import *
-from neuron     import Neuron
+from siqo_lib   import journal
+#from neuron     import Neuron
 from layer      import Layer
 
 
@@ -118,21 +118,21 @@ class ComTron():
         #----------------------------------------------------------------------
         # Metadata section
         meta = { 
-                 'id'    :{'dim':'string' , 'unit':'', 'coeff':1 },
-                 'lay'   :{'dim':'#'      , 'unit':'', 'coeff':1, 'min':0, 'max':0 },
-                 'pos'   :{'dim':'#'      , 'unit':'', 'coeff':1, 'min':0, 'max':0 },
+                 'id'    :{'typ':'id'  ,'dim':'id'                           },
+                 'lay'   :{'typ':'axe' ,'dim':'Lay' , 'unit':'Int', 'coeff':1, 'min':0, 'max':0 },
+                 'pos'   :{'typ':'axe' ,'dim':'Pos' , 'unit':'Int', 'coeff':1, 'min':0, 'max':0 },
                  
-                 'reAct' :{'dim':'Act.re' , 'unit':'', 'coeff':1},
-                 'imAct' :{'dim':'Act.im' , 'unit':'', 'coeff':1},
-                 'abAct' :{'dim':'Act.abs', 'unit':'', 'coeff':1},
+                 'reAct' :{'typ':'dat' ,'dim':'Act' , 'unit':'Re' , 'coeff':1},
+                 'imAct' :{'typ':'dat' ,'dim':'Act' , 'unit':'Im' , 'coeff':1},
+                 'abAct' :{'typ':'dat' ,'dim':'Act' , 'unit':'Abs', 'coeff':1},
 
-                 'reTgt' :{'dim':'Tgt.re' , 'unit':'', 'coeff':1},
-                 'imTgt' :{'dim':'Tgt.im' , 'unit':'', 'coeff':1},
-                 'abTgt' :{'dim':'Tgt.abs', 'unit':'', 'coeff':1},
+                 'reTgt' :{'typ':'dat' ,'dim':'Tgt' , 'unit':'Re' , 'coeff':1},
+                 'imTgt' :{'typ':'dat' ,'dim':'Tgt' , 'unit':'Im' , 'coeff':1},
+                 'abTgt' :{'typ':'dat' ,'dim':'Tgt' , 'unit':'Abs', 'coeff':1},
                  
-                 'reErr' :{'dim':'Err.re' , 'unit':'', 'coeff':1},
-                 'imErr' :{'dim':'Err.im' , 'unit':'', 'coeff':1},  
-                 'abErr' :{'dim':'Err.abs', 'unit':'', 'coeff':1},  
+                 'reErr' :{'typ':'dat' ,'dim':'Err' , 'unit':'Re' , 'coeff':1},
+                 'imErr' :{'typ':'dat' ,'dim':'Err' , 'unit':'Im' , 'coeff':1},  
+                 'abErr' :{'typ':'dat' ,'dim':'Err' , 'unit':'Abs', 'coeff':1},  
                }
         
         #----------------------------------------------------------------------
@@ -168,17 +168,19 @@ class ComTron():
         
         #----------------------------------------------------------------------
         # Aggregation section
+ 
+        for key, lst in toret['data'].items():
+            
+            # agregujem iba hodnoty pre osi
+            if toret['meta'][key]['typ'] == 'axe':
+            
+                pL = list(lst)  # Urobim si kopiu listu na pokusy :-)
+                pL.sort()
+                
+                toret['meta'][key]['min'] = pL[ 0]
+                toret['meta'][key]['max'] = pL[-1]
         
-        pLay = list(toret['data']['lay'])
-        pLay.sort()
-        pPos = list(toret['data']['pos'])
-        pPos.sort()
-        
-        toret['meta']['lay']['min'] = pLay[ 0]
-        toret['meta']['lay']['max'] = pLay[-1]
-        toret['meta']['pos']['min'] = pPos[ 0]
-        toret['meta']['pos']['max'] = pPos[-1]
-        
+        #----------------------------------------------------------------------
         journal.M( '<ComTron> {} getPlotData created {} records'.format(self.name, i), 10)
         return toret
 
@@ -192,7 +194,7 @@ class ComTron():
         print( "=======================================================================" )
         
 #------------------------------------------------------------------------------
-journal.M('ComTron class ver 0.11')
+journal.M('ComTron class ver 0.12')
 
 #==============================================================================
 #                              END OF FILE

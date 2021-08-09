@@ -1,9 +1,9 @@
 #==============================================================================
 # :ComTron test file
 #------------------------------------------------------------------------------
-from siqo_lib   import *
-from neuron     import Neuron
-from layer      import Layer
+from siqo_lib   import journal
+#from neuron     import Neuron
+#from layer      import Layer
 from comTron    import ComTron
 from comTronGui import ComTronGui
 

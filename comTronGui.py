@@ -9,9 +9,9 @@
 #    
 #
 #------------------------------------------------------------------------------
-from siqo_lib   import *
-from neuron     import Neuron
-from layer      import Layer
+from siqo_lib   import journal
+#from neuron     import Neuron
+#from layer      import Layer
 from comTron    import ComTron
 
 #from matplotlib.figure                 import Figure
@@ -65,12 +65,10 @@ class ComTronGui:
         self.axes    = {1:'Scatter', 2:'Quiver', 3:'3D projection'}
         self.actAxe  = 1
         
-        self.values  = { 1:'absAct',   2:'absTgt',  3:'absErr', 
-                         4:'reAct',    5:'reTgt',   6:'reErr',
-                         7:'imAct',    8:'imTgt',   8:'imErr'  }
-
-        self.actValU = 1
-        self.actValV = 2
+        self.keyX = 'lay'
+        self.keyY = 'pos'
+        self.keyU = 'reAct'
+        self.keyV = 'imAct'
         
         #----------------------------------------------------------------------
         # Ziskanie realnych dat na zobrazenie z podkladoveho priestoru
@@ -123,24 +121,34 @@ class ComTronGui:
         
         self.butValMapU = tk.IntVar()
 
-        for i, val in self.values.items():
-            self.butU = tk.Radiobutton(win, text="{} [{}]".format(val, self.meta[val]['dim']), variable=self.butValMapU, value=i, command=self.onButValU)
-            self.butU.place(x=self.w * _BTN_VAL_W, y = self.h * (_BTN_VAL_H + (i+15) * _BTN_DIS_H))
+        i = 0
+        for key in self.meta.keys():
+            
+            # Zobrazim iba udaje typu data
+            if self.meta[key]['typ'] == 'dat':
+                self.butU = tk.Radiobutton(win, text="{} [{}]".format(key, self.meta[key]['dim']), variable=self.butValMapU, value=i, command=self.onButValU)
+                self.butU.place(x=self.w * _BTN_VAL_W, y = self.h * (_BTN_VAL_H + (i+15) * _BTN_DIS_H))
+                i += 1
 
         self.butU.select()
-        self.butValMapU.set(self.actValU)
+        self.butValMapU.set(self.keyU)
 
         #----------------------------------------------------------------------
         # Value V buttons setup
         
         self.butValMapV = tk.IntVar()
 
-        for i, val in self.values.items():
-            self.butV = tk.Radiobutton(win, text="{} [{}]".format(val, self.meta[val]['dim']), variable=self.butValMapV, value=i, command=self.onButValV)
-            self.butV.place(x=self.w * (_BTN_VAL_W + _BTN_DIS_W), y = self.h * (_BTN_VAL_H + (i+15) * _BTN_DIS_H))
+        i = 0
+        for key in self.meta.keys():
+
+            # Zobrazim iba udaje typu data
+            if self.meta[key]['typ'] == 'dat':
+                self.butV = tk.Radiobutton(win, text="{} [{}]".format(key, self.meta[key]['dim']), variable=self.butValMapV, value=i, command=self.onButValV)
+                self.butV.place(x=self.w * (_BTN_VAL_W + _BTN_DIS_W), y = self.h * (_BTN_VAL_H + (i+15) * _BTN_DIS_H))
+                i += 1
 
         self.butV.select()
-        self.butValMapV.set(self.actValV)
+        self.butValMapV.set(self.keyV)
 
         #----------------------------------------------------------------------
         # Initialisation
@@ -159,26 +167,29 @@ class ComTronGui:
         journal.I( 'ComTronGui {} reScale...'.format(self.title), 10 )
         for key, lst in self.data.items():
             
-            pL = list(lst)  # Urobim si kopiu listu na pokusy :-)
-            pL.sort()
-                
-            # Najdem vhodny koeficient
-            if pL[-1]-pL[0] > 1e-12 : c = ('p', 1e+12)
-            if pL[-1]-pL[0] > 1e-09 : c = ('n', 1e+09)
-            if pL[-1]-pL[0] > 1e-06 : c = ('µ', 1e+06)
-            if pL[-1]-pL[0] > 1e-03 : c = ('m', 1e+03)
-            if pL[-1]-pL[0] > 1e+00 : c = ('',  1e+00)
-            if pL[-1]-pL[0] > 1e+03 : c = ('K', 1e-03)
-            if pL[-1]-pL[0] > 1e+06 : c = ('M', 1e-06)
-            if pL[-1]-pL[0] > 1e+09 : c = ('G', 1e-09)
-            if pL[-1]-pL[0] > 1e+12 : c = ('T', 1e-12)
-                
-            # Preskalujem udaje
-            for i in range(len(lst)): lst[i] = lst[i] * c[1]
-            self.meta[key]['unit' ] = c[0]
-            self.meta[key]['coeff'] = c[1]
+            # Preskalujem len nie-identifikatory
+            if self.meta[key]['typ'] != 'id':
             
-            journal.M( 'ComTronGui {} Data list {} was re-scaled by {:e} with preposition {}'.format(self.title, key, c[1], c[0]), 10 )
+                pL = list(lst)  # Urobim si kopiu listu na pokusy :-)
+                pL.sort()
+                
+                # Najdem vhodny koeficient
+                if pL[-1]-pL[0] > 1e-12 : c = ('p', 1e+12)
+                if pL[-1]-pL[0] > 1e-09 : c = ('n', 1e+09)
+                if pL[-1]-pL[0] > 1e-06 : c = ('µ', 1e+06)
+                if pL[-1]-pL[0] > 1e-03 : c = ('m', 1e+03)
+                if pL[-1]-pL[0] > 1e+00 : c = ('',  1e+00)
+                if pL[-1]-pL[0] > 1e+03 : c = ('K', 1e-03)
+                if pL[-1]-pL[0] > 1e+06 : c = ('M', 1e-06)
+                if pL[-1]-pL[0] > 1e+09 : c = ('G', 1e-09)
+                if pL[-1]-pL[0] > 1e+12 : c = ('T', 1e-12)
+                
+                # Preskalujem udaje
+                for i in range(len(lst)): lst[i] = lst[i] * c[1]
+                self.meta[key]['unit' ] = c[0] + self.meta[key]['unit' ]
+                self.meta[key]['coeff'] = c[1]
+            
+                journal.M( 'ComTronGui {} Data list {} was re-scaled by {:e} with preposition {}'.format(self.title, key, c[1], c[0]), 10 )
                 
         journal.O( 'ComTronGui {} reScale done'.format(self.title), 10 )
     
@@ -204,36 +215,25 @@ class ComTronGui:
         
         journal.I( "ComTronGui {} getDataSlice will use ".format(self.title), 10 )
 
-        x = []
-        y = []
-        u = []
-        v = []
-
-        xDim = self.values[self.actValX]
-        yDim = self.values[self.actValY]
-        uDim = self.values[self.actValU]
-        vDim = self.values[self.actValV]
-
-        i = 0
-        for sValue in self.data[sDim]:
-            
-            x.append( self.data[xDim][i] )
-            y.append( self.data[yDim][i] )
-            u.append( self.data[uDim][i] )
-            v.append( self.data[vDim][i] )
-            i += 1
+        # Priradim aktualne listy 
         
+        x = list( self.data[self.keyX] )
+        y = list( self.data[self.keyX] )
+        u = list( self.data[self.keyX] )
+        v = list( self.data[self.keyX] )
+        
+        # Konvertujem do np-array
         X = np.array(x)
-        journal.M( "ComTronGui {} getDataSlice X dimension is {} in <{:.3}, {:.3}>".format(self.title, xDim, X.min(), X.max()), 10 )
+        journal.M( "ComTronGui {} getDataSlice X dimension is {} in <{:.3}, {:.3}>".format(self.title, self.meta[self.keyX]['dim'], X.min(), X.max()), 10 )
 
         Y = np.array(y)
-        journal.M( "ComTronGui {} getDataSlice Y dimension is {} in <{:.3}, {:.3}>".format(self.title, yDim, Y.min(), Y.max()), 10 )
+        journal.M( "ComTronGui {} getDataSlice Y dimension is {} in <{:.3}, {:.3}>".format(self.title, self.meta[self.keyY]['dim'], Y.min(), Y.max()), 10 )
 
         U = np.array(u)
-        journal.M( "ComTronGui {} getDataSlice U dimension is {} in <{:.3}, {:.3}>".format(self.title, uDim, U.min(), U.max()), 10 )
+        journal.M( "ComTronGui {} getDataSlice U dimension is {} in <{:.3}, {:.3}>".format(self.title, self.meta[self.keyU]['dim'], U.min(), U.max()), 10 )
 
         V = np.array(v)
-        journal.M( "ComTronGui {} getDataSlice V dimension is {} in <{:.3}, {:.3}>".format(self.title, vDim, V.min(), V.max()), 10 )
+        journal.M( "ComTronGui {} getDataSlice V dimension is {} in <{:.3}, {:.3}>".format(self.title, self.meta[self.keyV]['dim'], V.min(), V.max()), 10 )
 
 
         journal.O( "ComTronGui {} getDataSlice return 4 x {} data points".format(self.title, len(x)), 10 )
@@ -255,16 +255,14 @@ class ComTronGui:
         (X, Y, U, V) = self.getDataSlice()
     
         # Priprava novych axes
-        valX = self.values[self.actValX]
-        valY = self.values[self.actValY]
 
         if self.actAxe == 1:
             
             self.ax = self.fig.add_subplot(1,1,1)
             self.ax.set_title("{}".format( self.axes[self.actAxe]), fontsize=14)
             self.ax.grid(True)
-            self.ax.set_xlabel( self.getDataLabel(valX) )
-            self.ax.set_ylabel( self.getDataLabel(valY) )
+            self.ax.set_xlabel( self.getDataLabel(self.keyX) )
+            self.ax.set_ylabel( self.getDataLabel(self.keyY) )
             
             sctr = self.ax.scatter( x=X, y=Y, c=U, cmap='RdYlBu_r')
             self.fig.colorbar(sctr, ax=self.ax)
@@ -274,8 +272,8 @@ class ComTronGui:
             self.ax = self.fig.add_subplot(1,1,1)
             self.ax.set_title("Amplitude's phase in <0, 2Pi>", fontsize=14)
             self.ax.grid(True)
-            self.ax.set_xlabel( self.getDataLabel(valX) )
-            self.ax.set_ylabel( self.getDataLabel(valY) )
+            self.ax.set_xlabel( self.getDataLabel(self.keyX) )
+            self.ax.set_ylabel( self.getDataLabel(self.keyY) )
             self.ax.quiver( X, Y, U, V )
             
         elif self.actAxe == 3:
@@ -283,8 +281,8 @@ class ComTronGui:
             self.ax = self.fig.add_subplot(1,1,1, projection='3d')
             self.ax.set_title("Phi angle as phi = omega*t - abs(k*r) in [rad]", fontsize=14)
             self.ax.grid(True)
-            self.ax.set_xlabel( self.getDataLabel(valX) )
-            self.ax.set_ylabel( self.getDataLabel(valY) )
+            self.ax.set_xlabel( self.getDataLabel(self.keyX) )
+            self.ax.set_ylabel( self.getDataLabel(self.keyY) )
             
             # Reduction z-axis 
             a = U.min()
@@ -364,7 +362,7 @@ class ComTronGui:
     #--------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-print('ComTron class GUI ver 0.10')
+print('ComTron class GUI ver 0.11')
 #==============================================================================
 #                              END OF FILE
 #------------------------------------------------------------------------------
