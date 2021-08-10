@@ -72,7 +72,8 @@ class ComTron():
         
         journal.I( '<ComTron> {} createNet...'.format(self.name), 10)
         
-        pL = list(layersSize[0])
+        pL = []
+        for size, join in layersSize: pL.append(size)
         pL.sort()
         maxSize = pL[-1]
 
@@ -215,7 +216,7 @@ class ComTron():
         print( "=======================================================================" )
         
 #------------------------------------------------------------------------------
-journal.M('ComTron class ver 0.13')
+journal.M('ComTron class ver 0.14')
 
 #==============================================================================
 #                              END OF FILE

@@ -40,7 +40,11 @@ class Layer():
         self.lay      = lay       #layer's  position in network <0,n>
         self.neurons  = []        # list of neurons in this layer
         
-        startPos = int((maxSize-size)/2)+1
+        # Creating list of neurons
+        startPos = int( (maxSize-size)/2 )
+        
+        journal.M( '<Layer> {} maxSize={}, size={}, startPos={}'.format(self.name, maxSize, size, startPos), 10 )
+
         for pos in range(startPos, startPos+size): 
             self.neurons.append( Neuron( 'Neuron {}-{}'.format(str(self.lay), str(pos)), pos ) )
 
@@ -101,7 +105,7 @@ class Layer():
         print( "-----------------------------------------------------------------------" )
         
 #------------------------------------------------------------------------------
-journal.M('Layer class ver 0.13')
+journal.M('Layer class ver 0.14')
 
 #==============================================================================
 #                              END OF FILE
