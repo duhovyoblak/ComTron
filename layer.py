@@ -9,7 +9,7 @@
 #    
 #
 #------------------------------------------------------------------------------
-from siqo_lib   import *
+from siqo_lib   import journal
 from neuron     import Neuron
 
 
@@ -31,17 +31,18 @@ class Layer():
     #==========================================================================
     # Constructor & utilities
     #--------------------------------------------------------------------------
-    def __init__(self, name, pos, size):
+    def __init__(self, name, lay, size, maxSize, joins):
         "Call constructor of Layer and initialise it with neurons"
 
         journal.I( '<Layer> {} constructor...'.format(name), 10 )
         
         self.name     = name      # unique name for layer in Your project
-        self.pos      = pos       #layer's  position in network <0,n>
+        self.lay      = lay       #layer's  position in network <0,n>
         self.neurons  = []        # list of neurons in this layer
         
-        for i in range(size): 
-            self.neurons.append( Neuron( 'Neuron {}-{}'.format(str(self.pos), str(i)) ) )
+        startPos = int((maxSize-size)/2)+1
+        for pos in range(startPos, startPos+size): 
+            self.neurons.append( Neuron( 'Neuron {}-{}'.format(str(self.lay), str(pos)), pos ) )
 
         journal.O( '<Layer> {} created'.format(self.name), 10 )
 
@@ -62,14 +63,21 @@ class Layer():
         return self.name
 
     #--------------------------------------------------------------------------
-    def getPosition(self):
+    def getLayPos(self):
         "Return layer's position in net"
         
-        return self.pos
+        return self.lay
 
     #==========================================================================
     # 
     #--------------------------------------------------------------------------
+    def annealing(self):
+        
+        journal.I( '<Layer> {} annealing'.format(self.name), 10)
+
+        for neu in self.neurons: neu.annealing()
+
+        journal.O( '<Layer> {} annealed'.format(self.name), 10)
 
 
     #==========================================================================
@@ -93,7 +101,7 @@ class Layer():
         print( "-----------------------------------------------------------------------" )
         
 #------------------------------------------------------------------------------
-journal.M('Layer class ver 0.11')
+journal.M('Layer class ver 0.13')
 
 #==============================================================================
 #                              END OF FILE

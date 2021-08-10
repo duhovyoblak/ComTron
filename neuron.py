@@ -9,8 +9,9 @@
 #    
 #
 #------------------------------------------------------------------------------
-from siqo_lib   import *
-from math       import sqrt, exp
+from siqo_lib   import journal
+from math       import sqrt, exp, sin, cos, pi
+from random     import seed, random
 
 
 #==============================================================================
@@ -31,11 +32,11 @@ class Neuron():
     #==========================================================================
     # Constructor & utilities
     #--------------------------------------------------------------------------
-    def __init__(self, name):
+    def __init__(self, name, pos):
         "Call constructor of Neuron and initialise it"
 
         self.name     = name      # unique name for neuron in Your project
-        self.pos      = 0         # neuron's position in layer in net coordinates
+        self.pos      = pos       # neuron's position in layer in net coordinates
         
         self.act      = complex() # actual   value of neuron's activation
         self.tgt      = complex() # expected value of neuron's activation
@@ -93,6 +94,17 @@ class Neuron():
     #==========================================================================
     # 
     #--------------------------------------------------------------------------
+    def annealing(self):
+        
+        alf = 2*pi*random()
+        
+        self.act = complex( cos(alf), sin(alf) )
+        
+        journal.M( '<Neuron> {} annealed to {}'.format(self.name, self.act), 10)
+
+    #==========================================================================
+    # 
+    #--------------------------------------------------------------------------
 
 
     #==========================================================================
@@ -111,10 +123,10 @@ class Neuron():
     def print(self):
         "Print neuron's properties" 
         
-        print( "   {} has act={}, tgt={}, err={}".format(self.name, sel.act.re, sel.tgt.re, sel.err.re ) )
+        print( "   {} has act={}, tgt={}, err={}".format(self.name, self.act.real, self.tgt.real, self.err.real ) )
         
 #------------------------------------------------------------------------------
-journal.M('Neuron class ver 0.10')
+journal.M('Neuron class ver 0.12')
 
 #==============================================================================
 #                              END OF FILE

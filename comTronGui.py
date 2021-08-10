@@ -218,9 +218,9 @@ class ComTronGui:
         # Priradim aktualne listy 
         
         x = list( self.data[self.keyX] )
-        y = list( self.data[self.keyX] )
-        u = list( self.data[self.keyX] )
-        v = list( self.data[self.keyX] )
+        y = list( self.data[self.keyY] )
+        u = list( self.data[self.keyU] )
+        v = list( self.data[self.keyV] )
         
         # Konvertujem do np-array
         X = np.array(x)

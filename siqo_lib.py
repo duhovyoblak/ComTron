@@ -42,14 +42,14 @@ class SiqoJournal:
     #--------------------------------------------------------------------------
     def I(self, mess, lvl=10 ):
         
-        self.M( mess, lvl )
+        self.M(  chr(354) + ' ' +  mess, lvl )
         self.indent += 1
     
     #--------------------------------------------------------------------------
     def O(self, mess, lvl=10 ):
     
         self.indent -= 1
-        self.M( mess, lvl )
+        self.M( chr(746) + ' ' + mess, lvl )
   
 #------------------------------------------------------------------------------
 journal = SiqoJournal('Journal')
@@ -62,7 +62,7 @@ journal.M('Journal start')
 
 
 #------------------------------------------------------------------------------
-journal.M('Siqo common library ver 1.02')
+journal.M('Siqo common library ver 1.03')
 
 #==============================================================================
 #                              END OF FILE

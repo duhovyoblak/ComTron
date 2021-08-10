@@ -71,19 +71,40 @@ class ComTron():
         "Create net as list of layers and resolve neuron connections"
         
         journal.I( '<ComTron> {} createNet...'.format(self.name), 10)
+        
+        pL = list(layersSize[0])
+        pL.sort()
+        maxSize = pL[-1]
 
         #----------------------------------------------------------------------
         # Create list of layers
         self.clear()
         
-        pos = 0
-        for size in layersSize:
-            self.layers.append( Layer( 'Layer {}'.format(str(pos)), pos, size ) )
-            pos += 1
+        lay = 0
+        for size, joins in layersSize:
+            self.layers.append( Layer( 'Layer {}'.format(str(lay)), lay, size, maxSize, joins ) )
+            lay += 1
 
         #----------------------------------------------------------------------
+        # Create joins between neurons
         
-        journal.O( '<ComTron> {} created net of {} layers'.format(self.name, str(pos)), 10)
+
+        #----------------------------------------------------------------------
+        # Initialise weights and act
+        self.annealing()
+
+        journal.O( '<ComTron> {} created net of {} layers'.format(self.name, str(lay)), 10)
+
+    #--------------------------------------------------------------------------
+    def annealing(self):
+        
+        journal.I( '<ComTron> {} annealing'.format(self.name), 10)
+
+        for lay in self.layers: lay.annealing()
+
+        journal.O( '<ComTron> {} annealed'.format(self.name), 10)
+
+    #--------------------------------------------------------------------------
 
     #==========================================================================
     # 
@@ -149,7 +170,7 @@ class ComTron():
             for neu in lay.neurons:
             
                 toret['data']['id'   ].append( neu.getName()             )
-                toret['data']['lay'  ].append( lay.getPosition()         )
+                toret['data']['lay'  ].append( lay.getLayPos()           )
                 toret['data']['pos'  ].append( neu.getPosition()         )
             
                 toret['data']['reAct'].append( neu.getAct().real         )
@@ -194,7 +215,7 @@ class ComTron():
         print( "=======================================================================" )
         
 #------------------------------------------------------------------------------
-journal.M('ComTron class ver 0.12')
+journal.M('ComTron class ver 0.13')
 
 #==============================================================================
 #                              END OF FILE
