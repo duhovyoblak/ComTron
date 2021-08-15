@@ -32,16 +32,16 @@ class Neuron():
     #==========================================================================
     # Constructor & utilities
     #--------------------------------------------------------------------------
-    def __init__(self, name, pos):
+    def __init__(self, name, pos, context):
         "Call constructor of Neuron and initialise it"
 
         self.name     = name      # unique name for neuron in Your project
         self.pos      = pos       # neuron's position in layer in net coordinates
+        self.srcs     = []        # list of source's neurons len = (2*context + 1)
         
         self.act      = complex() # actual   value of neuron's activation
         self.tgt      = complex() # expected value of neuron's activation
         self.err      = complex() # tgt-act  value of neuron's activation
-        self.src      = []        # list of source's neurons
 
         journal.M( '<Neuron> {} created'.format(self.name), 10 )
 
@@ -49,7 +49,7 @@ class Neuron():
     def clear(self):
         "Clear all data content and set default transformation parameters"
 
-        self.src = []
+        self.srcs = []
 
         journal.M( '<Neuron> {} ALL cleared'.format(self.name), 10)
         
@@ -62,7 +62,7 @@ class Neuron():
         return self.name
 
     #--------------------------------------------------------------------------
-    def getPosition(self):
+    def getPos(self):
         "Return neuron's position in layer in net coordinates"
         
         return self.pos
@@ -86,10 +86,13 @@ class Neuron():
         return self.err
 
     #--------------------------------------------------------------------------
-    def init(self, m=0.5, s=1):
-        "Set random neuron's activation with mean and sigma value"
+    def addSource(self, srcNeu):
+        "Adding one neuron to source Neurons"
         
-        self.act = (1, 0)
+        if type(srcNeu) == Neuron:
+            
+            self.srcs.append(srcNeu)
+            journal.M( '<Neuron> {} added {} as a source'.format(self.name, srcNeu.getName()), 10)
 
     #==========================================================================
     # 
@@ -123,10 +126,12 @@ class Neuron():
     def print(self):
         "Print neuron's properties" 
         
-        print( "   {} has act={}, tgt={}, err={}".format(self.name, self.act.real, self.tgt.real, self.err.real ) )
+        print( "   {} has act={}, tgt={}, err={}".format(self.name, self.act, self.tgt, self.err ) )
+        for src in self.srcs:
+            print("   {} has source {}".format(self.name, src.getName()))
         
 #------------------------------------------------------------------------------
-journal.M('Neuron class ver 0.12')
+journal.M('Neuron class ver 0.14')
 
 #==============================================================================
 #                              END OF FILE

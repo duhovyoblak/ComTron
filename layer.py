@@ -31,26 +31,59 @@ class Layer():
     #==========================================================================
     # Constructor & utilities
     #--------------------------------------------------------------------------
-    def __init__(self, name, lay, size, maxSize, joins):
+    def __init__(self, name, lay, size, context, startPos, srcLayer):
         "Call constructor of Layer and initialise it with neurons"
 
         journal.I( '<Layer> {} constructor...'.format(name), 10 )
         
-        self.name     = name      # unique name for layer in Your project
-        self.lay      = lay       #layer's  position in network <0,n>
-        self.neurons  = []        # list of neurons in this layer
+        self.name      = name      # unique name for layer in Your project
+        self.lay       = lay       # layer's  position in network <0,n>
+        self.neurons   = []        # list of neurons in this layer
+        self.context   = context   # number of neuron's sources in prevoius layer for both sides
+        self.startPos  = startPos  # starting position = position of first neuron in layer
+        self.srcLayer  = srcLayer  # reference to source Layer for neurons activation
         
-        # Creating list of neurons
-        startPos = int( (maxSize-size)/2 )
-        
-        journal.M( '<Layer> {} maxSize={}, size={}, startPos={}'.format(self.name, maxSize, size, startPos), 10 )
+        journal.M( '<Layer> {} lay={}, size={}, context={}, startPos={}'.format(self.name, self.lay, size, self.context, self.startPos), 10 )
+
+        #----------------------------------------------------------------------
+        # Create list of neurons belong to this layer
 
         for pos in range(startPos, startPos+size): 
-            self.neurons.append( Neuron( 'Neuron {}-{}'.format(str(self.lay), str(pos)), pos ) )
+            self.neurons.append( Neuron( 'Neuron {}-{}'.format(str(self.lay), str(pos)), pos, context ) )
+
+        #----------------------------------------------------------------------
+        # Create joins between neurons and theirs sources
+
+        if self.srcLayer != '_nil_':
+
+            journal.I( '<Layer> {} creating sources...'.format(self.name), 10)
+            i = 0
+        
+            #------------------------------------------------------------------
+            # Prejdem vsetky neurony vo vrstve
+            for tgtNeu in self.neurons:
+                
+                tgtPos = tgtNeu.getPos()
+                journal.M( 'Targte neuron {} at {} sources...'.format(tgtNeu.getName(), tgtPos), 10)
+                
+                # Vytvorim context na obe strany
+                for srcPos in range( tgtPos-context, tgtPos+context+1):
+                
+                    # Ak je to mozne, vytvorim vazbu tgt-src
+                    srcNeu = self.srcLayer.getNeuron(srcPos)
+                    tgtNeu.addSource(srcNeu)
+                
+                i += 1
+                #--------------------------------------------------------------
+
+            journal.O( '<Layer> {} sources for {} neurons created'.format(self.name, i), 10)
+            
+        else:
+            journal.M( '<Layer> {} has no source Layer'.format(self.name), 10)
 
         journal.O( '<Layer> {} created'.format(self.name), 10 )
-
-    #--------------------------------------------------------------------------
+        
+ #--------------------------------------------------------------------------
     def clear(self):
         "Clear all data content and set default transformation parameters"
         
@@ -71,6 +104,22 @@ class Layer():
         "Return layer's position in net"
         
         return self.lay
+
+    #--------------------------------------------------------------------------
+    def getContext(self):
+        "Return value of context for this layer"
+        
+        return self.context
+
+    #--------------------------------------------------------------------------
+    def getNeuron(self, pos):
+        "Return Layer's neuron at layPos"
+        
+        for neu in self.neurons:
+            if neu.getPos() == pos: return neu
+
+        journal.M( '<Layer> {} getNeuron error. Neuron at {} does not exist'.format(self.name, pos), 10)
+        return '_nil_'
 
     #==========================================================================
     # 
@@ -105,7 +154,7 @@ class Layer():
         print( "-----------------------------------------------------------------------" )
         
 #------------------------------------------------------------------------------
-journal.M('Layer class ver 0.14')
+journal.M('Layer class ver 0.16')
 
 #==============================================================================
 #                              END OF FILE
