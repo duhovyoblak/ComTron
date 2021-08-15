@@ -93,6 +93,9 @@ class Neuron():
             
             self.srcs.append(srcNeu)
             journal.M( '<Neuron> {} added {} as a source'.format(self.name, srcNeu.getName()), 10)
+            
+        else:
+            journal.M( '<Neuron> {} adding source error. Source is not a neuron'.format(self.name), 10)
 
     #==========================================================================
     # 
@@ -103,7 +106,7 @@ class Neuron():
         
         self.act = complex( cos(alf), sin(alf) )
         
-        journal.M( '<Neuron> {} annealed to {}'.format(self.name, self.act), 10)
+        journal.M( '<Neuron> {} annealed to ({:1.4},{:1.4})'.format(self.name, self.act.real, self.act.imag), 10)
 
     #==========================================================================
     # 
