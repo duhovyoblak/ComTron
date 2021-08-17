@@ -122,11 +122,11 @@ class ComTronGui:
         self.butValMapU = tk.IntVar()
 
         i = 0
-        for key in self.meta.keys():
+        for key in self.meta['points'].keys():
             
             # Zobrazim iba udaje typu data
-            if self.meta[key]['typ'] == 'dat':
-                self.butU = tk.Radiobutton(win, text="{} [{}]".format(key, self.meta[key]['dim']), variable=self.butValMapU, value=i, command=self.onButValU)
+            if self.meta['points'][key]['typ'] == 'dat':
+                self.butU = tk.Radiobutton(win, text="{} [{}]".format(key, self.meta['points'][key]['dim']), variable=self.butValMapU, value=i, command=self.onButValU)
                 self.butU.place(x=self.w * _BTN_VAL_W, y = self.h * (_BTN_VAL_H + (i+15) * _BTN_DIS_H))
                 i += 1
 
@@ -139,11 +139,11 @@ class ComTronGui:
         self.butValMapV = tk.IntVar()
 
         i = 0
-        for key in self.meta.keys():
+        for key in self.meta['points'].keys():
 
             # Zobrazim iba udaje typu data
-            if self.meta[key]['typ'] == 'dat':
-                self.butV = tk.Radiobutton(win, text="{} [{}]".format(key, self.meta[key]['dim']), variable=self.butValMapV, value=i, command=self.onButValV)
+            if self.meta['points'][key]['typ'] == 'dat':
+                self.butV = tk.Radiobutton(win, text="{} [{}]".format(key, self.meta['points'][key]['dim']), variable=self.butValMapV, value=i, command=self.onButValV)
                 self.butV.place(x=self.w * (_BTN_VAL_W + _BTN_DIS_W), y = self.h * (_BTN_VAL_H + (i+15) * _BTN_DIS_H))
                 i += 1
 
@@ -165,10 +165,10 @@ class ComTronGui:
         "Re-scale all data vectors for better understability"
         
         journal.I( 'ComTronGui {} reScale...'.format(self.title), 10 )
-        for key, lst in self.data.items():
+        for key, lst in self.data['points'].items():
             
             # Preskalujem len nie-identifikatory
-            if self.meta[key]['typ'] != 'id':
+            if self.meta['points'][key]['typ'] != 'id':
             
                 pL = list(lst)  # Urobim si kopiu listu na pokusy :-)
                 pL.sort()
@@ -186,8 +186,8 @@ class ComTronGui:
                 
                 # Preskalujem udaje
                 for i in range(len(lst)): lst[i] = lst[i] * c[1]
-                self.meta[key]['unit' ] = c[0] + self.meta[key]['unit' ]
-                self.meta[key]['coeff'] = c[1]
+                self.meta['points'][key]['unit' ] = c[0] + self.meta['points'][key]['unit' ]
+                self.meta['points'][key]['coeff'] = c[1]
             
                 journal.M( 'ComTronGui {} Data list {} was re-scaled by {:e} with preposition {}'.format(self.title, key, c[1], c[0]), 10 )
                 
@@ -197,17 +197,17 @@ class ComTronGui:
     def getDataLabel(self, key):
         "Return data label for given data's key"
         
-        return "${}$ [{}{}]".format(key, self.meta[key]['unit'], 
-                                         self.meta[key]['dim' ])
+        return "${}$ [{}{}]".format(key, self.meta['points'][key]['unit'], 
+                                         self.meta['points'][key]['dim' ])
     
     #--------------------------------------------------------------------------
     def getValByGrid(self, gv, key):
         "Return rescaled value for given grid's value and data's key"
         
-        gl = self.meta['g'+key]['max'] - self.meta['g'+key]['min']
-        vl = self.meta[    key]['max'] - self.meta[    key]['min']
+        gl = self.meta['points']['g'+key]['max'] - self.meta['points']['g'+key]['min']
+        vl = self.meta['points'][    key]['max'] - self.meta['points'][    key]['min']
         
-        return (gv/gl) * vl * self.meta[key]['coeff']
+        return (gv/gl) * vl * self.meta['points'][key]['coeff']
     
     #--------------------------------------------------------------------------
     def getDataSlice(self):
@@ -217,23 +217,23 @@ class ComTronGui:
 
         # Priradim aktualne listy 
         
-        x = list( self.data[self.keyX] )
-        y = list( self.data[self.keyY] )
-        u = list( self.data[self.keyU] )
-        v = list( self.data[self.keyV] )
+        x = list( self.data['points'][self.keyX] )
+        y = list( self.data['points'][self.keyY] )
+        u = list( self.data['points'][self.keyU] )
+        v = list( self.data['points'][self.keyV] )
         
         # Konvertujem do np-array
         X = np.array(x)
-        journal.M( "ComTronGui {} getDataSlice X dimension is {} in <{:.3}, {:.3}>".format(self.title, self.meta[self.keyX]['dim'], X.min(), X.max()), 10 )
+        journal.M( "ComTronGui {} getDataSlice X dimension is {} in <{:.3}, {:.3}>".format(self.title, self.meta['points'][self.keyX]['dim'], X.min(), X.max()), 10 )
 
         Y = np.array(y)
-        journal.M( "ComTronGui {} getDataSlice Y dimension is {} in <{:.3}, {:.3}>".format(self.title, self.meta[self.keyY]['dim'], Y.min(), Y.max()), 10 )
+        journal.M( "ComTronGui {} getDataSlice Y dimension is {} in <{:.3}, {:.3}>".format(self.title, self.meta['points'][self.keyY]['dim'], Y.min(), Y.max()), 10 )
 
         U = np.array(u)
-        journal.M( "ComTronGui {} getDataSlice U dimension is {} in <{:.3}, {:.3}>".format(self.title, self.meta[self.keyU]['dim'], U.min(), U.max()), 10 )
+        journal.M( "ComTronGui {} getDataSlice U dimension is {} in <{:.3}, {:.3}>".format(self.title, self.meta['points'][self.keyU]['dim'], U.min(), U.max()), 10 )
 
         V = np.array(v)
-        journal.M( "ComTronGui {} getDataSlice V dimension is {} in <{:.3}, {:.3}>".format(self.title, self.meta[self.keyV]['dim'], V.min(), V.max()), 10 )
+        journal.M( "ComTronGui {} getDataSlice V dimension is {} in <{:.3}, {:.3}>".format(self.title, self.meta['points'][self.keyV]['dim'], V.min(), V.max()), 10 )
 
 
         journal.O( "ComTronGui {} getDataSlice return 4 x {} data points".format(self.title, len(x)), 10 )
@@ -344,9 +344,9 @@ class ComTronGui:
             valY = self.values[self.actValY]
             valS = self.values[self.actValS]
             
-            x = x                                  / self.meta[valX]['coeff']
-            y = y                                  / self.meta[valY]['coeff']
-            s = self.getValByGrid(self.sVal, valS) / self.meta[valS]['coeff']
+            x = x                                  / self.meta['points'][valX]['coeff']
+            y = y                                  / self.meta['points'][valY]['coeff']
+            s = self.getValByGrid(self.sVal, valS) / self.meta['points'][valS]['coeff']
             
             pos = {'x':0, 'y':0, 'z':0, 't':0}
             pos[valX] = x
@@ -362,7 +362,7 @@ class ComTronGui:
     #--------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-print('ComTron class GUI ver 0.11')
+print('ComTron class GUI ver 0.12')
 #==============================================================================
 #                              END OF FILE
 #------------------------------------------------------------------------------

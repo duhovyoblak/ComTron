@@ -34,7 +34,7 @@ if __name__ =='__main__':
     # OUT: [ { 'in':'', 'target':int, 'out':[{'target':float}], 'win':int } ]
  
     # Vytvorim GUI
-    # gui = ComTronGui(ct)
+    gui = ComTronGui(ct)
     
     
     

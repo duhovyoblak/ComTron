@@ -173,71 +173,90 @@ class ComTron():
         
         #----------------------------------------------------------------------
         # Metadata section
-        meta = { 
-                 'id'    :{'typ':'id'  ,'dim':'id'                           },
-                 'lay'   :{'typ':'axe' ,'dim':'Lay' , 'unit':'Int', 'coeff':1, 'min':0, 'max':0 },
-                 'pos'   :{'typ':'axe' ,'dim':'Pos' , 'unit':'Int', 'coeff':1, 'min':0, 'max':0 },
+        meta = { 'points': {
+                   'id'    :{'typ':'id'  ,'dim':'id'                           },
+                   'lay'   :{'typ':'axe' ,'dim':'Lay' , 'unit':'Int', 'coeff':1, 'min':0, 'max':0 },
+                   'pos'   :{'typ':'axe' ,'dim':'Pos' , 'unit':'Int', 'coeff':1, 'min':0, 'max':0 },
                  
-                 'reAct' :{'typ':'dat' ,'dim':'Act' , 'unit':'Re' , 'coeff':1},
-                 'imAct' :{'typ':'dat' ,'dim':'Act' , 'unit':'Im' , 'coeff':1},
-                 'abAct' :{'typ':'dat' ,'dim':'Act' , 'unit':'Abs', 'coeff':1},
+                   'reAct' :{'typ':'dat' ,'dim':'Act' , 'unit':'Re' , 'coeff':1},
+                   'imAct' :{'typ':'dat' ,'dim':'Act' , 'unit':'Im' , 'coeff':1},
+                   'abAct' :{'typ':'dat' ,'dim':'Act' , 'unit':'Abs', 'coeff':1},
 
-                 'reTgt' :{'typ':'dat' ,'dim':'Tgt' , 'unit':'Re' , 'coeff':1},
-                 'imTgt' :{'typ':'dat' ,'dim':'Tgt' , 'unit':'Im' , 'coeff':1},
-                 'abTgt' :{'typ':'dat' ,'dim':'Tgt' , 'unit':'Abs', 'coeff':1},
+                   'reTgt' :{'typ':'dat' ,'dim':'Tgt' , 'unit':'Re' , 'coeff':1},
+                   'imTgt' :{'typ':'dat' ,'dim':'Tgt' , 'unit':'Im' , 'coeff':1},
+                   'abTgt' :{'typ':'dat' ,'dim':'Tgt' , 'unit':'Abs', 'coeff':1},
                  
-                 'reErr' :{'typ':'dat' ,'dim':'Err' , 'unit':'Re' , 'coeff':1},
-                 'imErr' :{'typ':'dat' ,'dim':'Err' , 'unit':'Im' , 'coeff':1},  
-                 'abErr' :{'typ':'dat' ,'dim':'Err' , 'unit':'Abs', 'coeff':1},  
+                   'reErr' :{'typ':'dat' ,'dim':'Err' , 'unit':'Re' , 'coeff':1},
+                   'imErr' :{'typ':'dat' ,'dim':'Err' , 'unit':'Im' , 'coeff':1},  
+                   'abErr' :{'typ':'dat' ,'dim':'Err' , 'unit':'Abs', 'coeff':1}
+                           },
+                 'lines': {}
                }
         
         #----------------------------------------------------------------------
         # Data section
-        data = { 'id'   :[], 'lay'  :[], 'pos'  :[],
-                 'reAct':[], 'imAct':[], 'abAct':[],
-                 'reTgt':[], 'imTgt':[], 'abTgt':[],
-                 'reErr':[], 'imErr':[], 'abErr':[]  }
+        data = { 'points':{ 'id'   :[], 'lay'  :[], 'pos'  :[],
+                            'reAct':[], 'imAct':[], 'abAct':[],
+                            'reTgt':[], 'imTgt':[], 'abTgt':[],
+                            'reErr':[], 'imErr':[], 'abErr':[]  
+                          }
+               }
         
         toret = { 'meta':meta, 'data':data }
+        
+        #----------------------------------------------------------------------
+        # Create poits data
         
         i = 0
         for lay in self.layers:
             for neu in lay.neurons:
             
-                toret['data']['id'   ].append( neu.getName()             )
-                toret['data']['lay'  ].append( lay.getLayPos()           )
-                toret['data']['pos'  ].append( neu.getPosition()         )
+                toret['data']['points']['id'   ].append( neu.getName()      )
+                toret['data']['points']['lay'  ].append( lay.getLayPos()    )
+                toret['data']['points']['pos'  ].append( neu.getPos()       )
             
-                toret['data']['reAct'].append( neu.getAct().real         )
-                toret['data']['imAct'].append( neu.getAct().imag         )
-                toret['data']['abAct'].append( abs(neu.getAct())         )
+                toret['data']['points']['reAct'].append( neu.getAct().real  )
+                toret['data']['points']['imAct'].append( neu.getAct().imag  )
+                toret['data']['points']['abAct'].append( abs(neu.getAct())  )
 
-                toret['data']['reTgt'].append( neu.getTgt().real         )
-                toret['data']['imTgt'].append( neu.getTgt().imag         )
-                toret['data']['abTgt'].append( abs(neu.getTgt())         )
+                toret['data']['points']['reTgt'].append( neu.getTgt().real  )
+                toret['data']['points']['imTgt'].append( neu.getTgt().imag  )
+                toret['data']['points']['abTgt'].append( abs(neu.getTgt())  )
 
-                toret['data']['reErr'].append( neu.getErr().real         )
-                toret['data']['imErr'].append( neu.getErr().imag         )
-                toret['data']['abErr'].append( abs(neu.getErr())         )
+                toret['data']['points']['reErr'].append( neu.getErr().real  )
+                toret['data']['points']['imErr'].append( neu.getErr().imag  )
+                toret['data']['points']['abErr'].append( abs(neu.getErr())  )
 
                 i +=1
+
+        journal.M( '<ComTron> {} getPlotData created {} points'.format(self.name, i), 10)
         
         #----------------------------------------------------------------------
         # Aggregation section
  
-        for key, lst in toret['data'].items():
+        for key, lst in toret['data']['points'].items():
             
             # agregujem iba hodnoty pre osi
-            if toret['meta'][key]['typ'] == 'axe':
+            if toret['meta']['points'][key]['typ'] == 'axe':
             
                 pL = list(lst)  # Urobim si kopiu listu na pokusy :-)
                 pL.sort()
                 
-                toret['meta'][key]['min'] = pL[ 0]
-                toret['meta'][key]['max'] = pL[-1]
+                toret['meta']['points'][key]['min'] = pL[ 0]
+                toret['meta']['points'][key]['max'] = pL[-1]
+
+        journal.M( '<ComTron> {} getPlotData created aggregations for points'.format(self.name), 10)
         
         #----------------------------------------------------------------------
-        journal.M( '<ComTron> {} getPlotData created {} records'.format(self.name, i), 10)
+        # Create line section
+
+        i = 0
+
+        journal.M( '<ComTron> {} getPlotData created {} lines'.format(self.name, i), 10)
+
+        #----------------------------------------------------------------------
+
+        journal.M( '<ComTron> {} getPlotData done'.format(self.name), 10)
         return toret
 
     #--------------------------------------------------------------------------
@@ -250,7 +269,7 @@ class ComTron():
         print( "=======================================================================" )
         
 #------------------------------------------------------------------------------
-journal.M('ComTron class ver 0.16')
+journal.M('ComTron class ver 0.17')
 
 #==============================================================================
 #                              END OF FILE
