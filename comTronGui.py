@@ -174,6 +174,7 @@ class ComTronGui:
                 pL.sort()
                 
                 # Najdem vhodny koeficient
+                c = ('x', 1e+12)
                 if pL[-1]-pL[0] > 1e-12 : c = ('p', 1e+12)
                 if pL[-1]-pL[0] > 1e-09 : c = ('n', 1e+09)
                 if pL[-1]-pL[0] > 1e-06 : c = ('µ', 1e+06)

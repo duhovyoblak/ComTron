@@ -87,27 +87,31 @@ class ComTron():
     #==========================================================================
     # Tools for net initialisation
     #--------------------------------------------------------------------------
-    def createNet(self, layersSize ):
+    def createNet(self, topo ):
         "Create net as list of layers and resolve neuron connections"
         
         journal.I( '<ComTron> {} createNet...'.format(self.name), 10)
-        
-        pL = []
-        for size, context in layersSize: pL.append(size)
-        pL.sort()
-        maxSize = pL[-1]
+        self.clear()
 
         #----------------------------------------------------------------------
-        # Create list of layers
-        self.clear()
+        # Create input layer   [('IN',8), ('CLASS',3), ('OUT',2)]
         
-        lay       = 0
-        prevLayer = '_nil_'
+        lay  = 0
+        size = topo[0][1]
         
-        for size, context in layersSize:
+        prevLayer = Layer( 'Input_{}'.format(str(lay)), lay, size )
+        self.layers.append( prevLayer )
+        lay += 1
+
+        #----------------------------------------------------------------------
+        # Create list of others layers
+
+        for typ, context in topo[1:]:
+
+            if   typ == 'CLASS': prevLayer = prevLayer.addClassLayer( 'CLASS_{}'.format(str(lay)), lay, context )
+            elif typ == 'OUT'  : prevLayer = prevLayer.addOutLayer  (   'OUT_{}'.format(str(lay)), lay, context )
             
-            startPos  = int( (maxSize-size)/2 )
-            prevLayer = self.addLayer( lay, size, context, startPos, prevLayer )
+            self.layers.append( prevLayer )
             lay += 1
 
         journal.M( '<ComTron> {} {} layers created'.format(self.name, lay), 10)
@@ -117,18 +121,6 @@ class ComTron():
         self.annealing()
 
         journal.O( '<ComTron> {} net created'.format(self.name), 10)
-
-    #--------------------------------------------------------------------------
-    def addLayer(self, lay, size, context, startPos, srcLayer):
-
-        journal.I( '<ComTron> {} is adding new Layer...'.format(self.name), 10)
-
-        toret = Layer( 'Layer {}'.format(str(lay)), lay, size, context, startPos, srcLayer )
-
-        self.layers.append( toret )
-        
-        journal.O( '<ComTron> {} added {}'.format(self.name, toret.getName()), 10)
-        return toret
 
     #--------------------------------------------------------------------------
     def annealing(self):
@@ -269,7 +261,7 @@ class ComTron():
         print( "=======================================================================" )
         
 #------------------------------------------------------------------------------
-journal.M('ComTron class ver 0.17')
+journal.M('ComTron class ver 0.18')
 
 #==============================================================================
 #                              END OF FILE

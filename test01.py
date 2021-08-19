@@ -26,15 +26,15 @@ if __name__ =='__main__':
     journal.I( 'ComTron test 01' )
     
     # Vytvorim testovaci ComTron
-    ct = ComTron( 'test 5-8-2' )
-    ct.createNet([(5,1), (8,3), (2,8)])
+    ct = ComTron( 'test 10-3-1' )
+    ct.createNet( [('IN',11), ('CLASS',3), ('OUT',1)] )
     ct.setIOFile( 'testfile' )
     
     # IN:  [ { 'in':'', 'dat':[], 'target':int } ]
     # OUT: [ { 'in':'', 'target':int, 'out':[{'target':float}], 'win':int } ]
  
     # Vytvorim GUI
-    gui = ComTronGui(ct)
+ #   gui = ComTronGui(ct)
     
     
     

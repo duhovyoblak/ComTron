@@ -32,12 +32,13 @@ class Neuron():
     #==========================================================================
     # Constructor & utilities
     #--------------------------------------------------------------------------
-    def __init__(self, name, pos, context):
+    def __init__(self, name, pos):
         "Call constructor of Neuron and initialise it"
 
         self.name     = name      # unique name for neuron in Your project
         self.pos      = pos       # neuron's position in layer in net coordinates
-        self.srcs     = []        # list of source's neurons len = (2*context + 1)
+        self.srcs     = []        # list of source's neurons     len = (2*context + 1)
+        self.nbhs     = []        # list of neuron's neigbbors   len = 2 for 1-dim layer
         
         self.act      = complex() # actual   value of neuron's activation
         self.tgt      = complex() # expected value of neuron's activation
@@ -134,7 +135,7 @@ class Neuron():
             print("   {} has source {}".format(self.name, src.getName()))
         
 #------------------------------------------------------------------------------
-journal.M('Neuron class ver 0.14')
+journal.M('Neuron class ver 0.16')
 
 #==============================================================================
 #                              END OF FILE
