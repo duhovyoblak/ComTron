@@ -182,7 +182,8 @@ class ComTron():
                    'imErr' :{'typ':'dat' ,'dim':'Err' , 'unit':'Im' , 'coeff':1},  
                    'abErr' :{'typ':'dat' ,'dim':'Err' , 'unit':'Abs', 'coeff':1}
                            },
-                 'lines': {}
+            
+                 'arrows':  {}
                }
         
         #----------------------------------------------------------------------
@@ -191,21 +192,34 @@ class ComTron():
                             'reAct':[], 'imAct':[], 'abAct':[],
                             'reTgt':[], 'imTgt':[], 'abTgt':[],
                             'reErr':[], 'imErr':[], 'abErr':[]  
+                          },
+                 'arrows':{ 'shape':'right',
+                            'color':'blue',
+                            'width':1,
+                            'data':{}
                           }
                }
         
         toret = { 'meta':meta, 'data':data }
         
         #----------------------------------------------------------------------
-        # Create poits data
+        # Create data
         
-        i = 0
+        pts = 0
+        lns = 0
         for lay in self.layers:
+            
+            layPos = lay.getLayPos()
+            
             for neu in lay.neurons:
             
-                toret['data']['points']['id'   ].append( neu.getName()      )
-                toret['data']['points']['lay'  ].append( lay.getLayPos()    )
-                toret['data']['points']['pos'  ].append( neu.getPos()       )
+                idt = neu.getName()
+                pos = neu.getPos()
+
+                # Points data for neuron
+                toret['data']['points']['id'   ].append( idt                )
+                toret['data']['points']['lay'  ].append( layPos             )
+                toret['data']['points']['pos'  ].append( pos                )
             
                 toret['data']['points']['reAct'].append( neu.getAct().real  )
                 toret['data']['points']['imAct'].append( neu.getAct().imag  )
@@ -219,9 +233,26 @@ class ComTron():
                 toret['data']['points']['imErr'].append( neu.getErr().imag  )
                 toret['data']['points']['abErr'].append( abs(neu.getErr())  )
 
-                i +=1
+                pts +=1
+                
+                #Arrows data for target neuron
+                arrs = []
+ 
+                for src in neu.getSources():
+                    
+                    arrs.append({'x' :         src.getLayPos(), 'y' :      src.getPos(), 
+                                 'dx':layPos - src.getLayPos(), 'dy':pos - src.getPos() })
+                    lns +=1
+                    
+                # Ak existuju sipky, zapisem ich do dat
+                if len(arrs) > 0:
+                    
+                    toret['data']['arrows']['data'][idt] = arrs
 
-        journal.M( '<ComTron> {} getPlotData created {} points'.format(self.name, i), 10)
+        # end create datapoints
+        #----------------------------------------------------------------------
+
+        journal.M( '<ComTron> {} getPlotData created {} points and {} lines'.format(self.name, pts, lns), 10)
         
         #----------------------------------------------------------------------
         # Aggregation section
@@ -240,14 +271,6 @@ class ComTron():
         journal.M( '<ComTron> {} getPlotData created aggregations for points'.format(self.name), 10)
         
         #----------------------------------------------------------------------
-        # Create line section
-
-        i = 0
-
-        journal.M( '<ComTron> {} getPlotData created {} lines'.format(self.name, i), 10)
-
-        #----------------------------------------------------------------------
-
         journal.M( '<ComTron> {} getPlotData done'.format(self.name), 10)
         return toret
 
@@ -261,7 +284,7 @@ class ComTron():
         print( "=======================================================================" )
         
 #------------------------------------------------------------------------------
-journal.M('ComTron class ver 0.18')
+journal.M('ComTron class ver 0.20')
 
 #==============================================================================
 #                              END OF FILE

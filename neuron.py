@@ -32,10 +32,11 @@ class Neuron():
     #==========================================================================
     # Constructor & utilities
     #--------------------------------------------------------------------------
-    def __init__(self, name, pos):
+    def __init__(self, name, lay, pos):
         "Call constructor of Neuron and initialise it"
 
         self.name     = name      # unique name for neuron in Your project
+        self.lay      = lay       # layer's  position in net coordinates
         self.pos      = pos       # neuron's position in layer in net coordinates
         self.srcs     = []        # list of source's neurons     len = (2*context + 1)
         self.nbhs     = []        # list of neuron's neigbbors   len = 2 for 1-dim layer
@@ -63,6 +64,12 @@ class Neuron():
         return self.name
 
     #--------------------------------------------------------------------------
+    def getLayPos(self):
+        "Return layer's position in net in which neuron belongs"
+        
+        return self.lay
+
+    #--------------------------------------------------------------------------
     def getPos(self):
         "Return neuron's position in layer in net coordinates"
         
@@ -85,6 +92,12 @@ class Neuron():
         "Return neuron's value of Error"
         
         return self.err
+
+    #--------------------------------------------------------------------------
+    def getSources(self):
+        "Return neuron's sources of activation"
+        
+        return self.srcs
 
     #--------------------------------------------------------------------------
     def addSource(self, srcNeu):
@@ -135,7 +148,7 @@ class Neuron():
             print("   {} has source {}".format(self.name, src.getName()))
         
 #------------------------------------------------------------------------------
-journal.M('Neuron class ver 0.16')
+journal.M('Neuron class ver 0.18')
 
 #==============================================================================
 #                              END OF FILE

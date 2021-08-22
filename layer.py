@@ -37,7 +37,7 @@ class Layer():
         journal.I( '<Layer> {} constructor...'.format(name), 10 )
         
         self.name      = name     # unique name for layer in Your project
-        self.lay       = lay      # layer's  position in network <0,n>
+        self.lay       = lay      # layer's  position in net coordinates
         self.type      = 'IN'     # type of layer [IN, CLASS, OUT]
         self.neurons   = []       # list of neurons in this layer
         self.context   = 0        # number of neuron's sources in prevoius layer for both sides
@@ -50,7 +50,7 @@ class Layer():
         # Create list of neurons belong to this layer
 
         for pos in range(startPos, startPos+size): 
-            self.neurons.append( Neuron( 'Neuron {}-{}'.format(str(self.lay), str(pos)), pos ) )
+            self.neurons.append( Neuron( 'Neuron {}-{}'.format(str(self.lay), str(pos)), lay, pos ) )
 
         journal.O( '<Layer> {} created'.format(self.name), 10 )
         

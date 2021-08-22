@@ -222,7 +222,7 @@ class ComTronGui:
         y = list( self.data['points'][self.keyY] )
         u = list( self.data['points'][self.keyU] )
         v = list( self.data['points'][self.keyV] )
-        
+
         # Konvertujem do np-array
         X = np.array(x)
         journal.M( "ComTronGui {} getDataSlice X dimension is {} in <{:.3}, {:.3}>".format(self.title, self.meta['points'][self.keyX]['dim'], X.min(), X.max()), 10 )
@@ -265,9 +265,13 @@ class ComTronGui:
             self.ax.set_xlabel( self.getDataLabel(self.keyX) )
             self.ax.set_ylabel( self.getDataLabel(self.keyY) )
             
+            # Vykreslenie neuronov
             sctr = self.ax.scatter( x=X, y=Y, c=U, cmap='RdYlBu_r')
             self.fig.colorbar(sctr, ax=self.ax)
             
+            # Vykreslenie vazieb medzi neuronmi
+            self.showArrows()
+           
         elif self.actAxe == 2:
             
             self.ax = self.fig.add_subplot(1,1,1)
@@ -276,6 +280,9 @@ class ComTronGui:
             self.ax.set_xlabel( self.getDataLabel(self.keyX) )
             self.ax.set_ylabel( self.getDataLabel(self.keyY) )
             self.ax.quiver( X, Y, U, V )
+
+            # Vykreslenie vazieb medzi neuronmi
+            self.showArrows()
             
         elif self.actAxe == 3:
             
@@ -310,6 +317,22 @@ class ComTronGui:
     
         journal.O( 'ComTronGui {} show done'.format(self.title), 10 )
         
+    #--------------------------------------------------------------------------
+    def showArrows(self):
+        "Show arrows between neurons"
+        
+        shp = self.data['arrows']['shape']
+        col = self.data['arrows']['color']
+        
+        # prejdenm vstky target neurony
+        for id, arrs in self.data['arrows']['data'].items():
+            
+            # prejdem vsetky sipky pre source neurony
+            for arr in arrs:
+                
+                self.ax.arrow( arr['x'], arr['y'], arr['dx'], arr['dy'], shape=shp, color=col )
+
+
     #--------------------------------------------------------------------------
     def onButAxe(self):
         "Resolve radio buttons selection for active Axe of figure"
@@ -363,7 +386,7 @@ class ComTronGui:
     #--------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-print('ComTron class GUI ver 0.12')
+print('ComTron class GUI ver 0.14')
 #==============================================================================
 #                              END OF FILE
 #------------------------------------------------------------------------------
