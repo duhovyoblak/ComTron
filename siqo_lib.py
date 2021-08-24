@@ -28,10 +28,16 @@ class SiqoJournal:
     def __init__(self, name):
         "Call constructor of SiqoJournal and initialise it with empty data"
         
-        self.name       = name
+        self.name = name
+        self.reset()
+   
+    #--------------------------------------------------------------------------
+    def reset(self):
+        "nastavi default parametre"
+        
         self.debugLevel = 10
         self.indent     = 0
-    
+
     #--------------------------------------------------------------------------
     def M(self, mess, lvl=10 ):
         "vypise spravu do terminalu"
@@ -42,7 +48,7 @@ class SiqoJournal:
     #--------------------------------------------------------------------------
     def I(self, mess, lvl=10 ):
         
-        self.M(  chr(354) + ' ' +  mess, lvl )
+        self.M(  chr(691) + ' ' +  mess, lvl )
         self.indent += 1
     
     #--------------------------------------------------------------------------
@@ -59,10 +65,8 @@ journal.M('Journal start')
 # Journal
 #------------------------------------------------------------------------------
 
-
-
 #------------------------------------------------------------------------------
-journal.M('Siqo common library ver 1.03')
+journal.M('Siqo common library ver 1.04')
 
 #==============================================================================
 #                              END OF FILE
